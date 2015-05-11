@@ -1,0 +1,32 @@
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+
+jar {
+  baseName = 'Api'
+  version = '0.1.0'
+}
+
+bootRepackage {
+    enabled = false
+}
+
+run {
+  enabled = false
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+maven { url 'http://repo.spring.io/libs-snapshot' }
+  jcenter()
+}
+
+dependencies {
+  compile 'org.mongodb:mongo-java-driver:3.0.0-rc0'
+  compile 'com.h2database:h2'
+  compile 'ro.fortsoft.pf4j:pf4j:0.4'
+  compile 'org.springframework.boot:spring-boot-starter-web'
+  compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+  compile 'io.projectreactor.spring:reactor-spring-context:2.0.0.RC1'
+  testCompile group: 'junit', name: 'junit', version: '4.+'
+}
