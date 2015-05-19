@@ -39,8 +39,7 @@ public class RegisteringPlugin extends Plugin {
 		ClassLoader localPluginLoader = this.getClass().getClassLoader();
 			
 		//register Plugin Repositories
-		m_pluginManager.registerServiceRepository(localPluginLoader);
-		m_pluginManager.registerJobRepository(localPluginLoader);
+		m_pluginManager.registerClassLoader(localPluginLoader);
 
     	// create scanner and disable default filters (that is the 'false' argument)
     	final ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
