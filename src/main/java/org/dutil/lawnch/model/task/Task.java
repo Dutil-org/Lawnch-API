@@ -16,15 +16,32 @@ import javax.persistence.Transient;
 import org.dutil.lawnch.model.descriptor.Describable;
 import org.dutil.lawnch.model.descriptor.Descriptor;
 import org.dutil.lawnch.model.result.Result;
+import org.dutil.lawnch.system.GlobalState;
+import org.dutil.lawnch.system.ObjectNotRegisteredException;
 import org.dutil.lawnch.system.SessionInterface;
 
+import reactor.Environment;
+import reactor.rx.Stream;
 import reactor.rx.broadcast.Broadcaster;
 import reactor.core.processor.RingBufferProcessor;
+import reactor.fn.Consumer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @MappedSuperclass
 public abstract class Task <T extends Result> implements Runnable, Describable, Configurable{
+	
+	public enum State 
+	{
+		CREATED, CONFIGURED, DEPENDENCIES_RESOLUTED, SUBTASKS_CREATED, SUBTASKLIST_CREATED, SUBTASKS_EXTRACTED, RUNNING, FINISHED
+	}
+
+	public class StateChange
+	{
+		public Task target;
+		public State formerState;
+		public State newState;
+	}
 	
 	@JsonProperty("id")
     @Id
@@ -36,7 +53,7 @@ public abstract class Task <T extends Result> implements Runnable, Describable, 
     protected Descriptor m_descriptor;
 	
 	@JsonProperty("state")
-	private float m_state;
+	private State m_state;
     
     @JsonProperty("configuration")
     @OneToOne(fetch = FetchType.EAGER, targetEntity = Result.class)
@@ -48,7 +65,7 @@ public abstract class Task <T extends Result> implements Runnable, Describable, 
 	private List<TaskRepresentative> m_dependencies;
     
     @Transient
-    private Broadcaster<Task> m_hasFinished;
+    private Broadcaster<StateChange> m_stateStream;
     @Transient 
     private List<String> m_requirements;
     @Transient 
@@ -62,8 +79,26 @@ public abstract class Task <T extends Result> implements Runnable, Describable, 
     	m_descriptor = new Descriptor((Class<Task>)this.getClass());
     	m_descriptor.commonName(this.getClass().getName());
     	m_dependencies = new Vector<TaskRepresentative>();
-    	m_hasFinished = Broadcaster.create();
+    	
+    	try 
+    	{
+			Environment env = GlobalState.get("EventReactorEnvironment");
+			m_stateStream = Broadcaster.create(env);
+			m_stateStream.when(Exception.class, errorHandler());
+		} 
+    	catch (ObjectNotRegisteredException e) 
+    	{
+			e.printStackTrace();
+		}
+    	
+		m_state = State.CREATED;
 	}
+	
+    public static Consumer<Exception> errorHandler() {
+        return ev -> {
+          System.out.println("Task> Task ERROR: " + ev.getMessage());
+        };
+    }
 	
 	public void session(SessionInterface session)
 	{
@@ -88,15 +123,15 @@ public abstract class Task <T extends Result> implements Runnable, Describable, 
 	
 	public void run()
 	{
-		m_state = 0f;
+		state(State.RUNNING);
 		execute();
-		m_state = 1f;
+		state(State.FINISHED);
 		finished();
 	}
 	
-	public Broadcaster<Task> finishedBroadcaster()
+	public Stream<StateChange> stateStream()
 	{
-		return m_hasFinished;
+		return m_stateStream;
 	}
 	
 	@JsonProperty("id")
@@ -112,15 +147,26 @@ public abstract class Task <T extends Result> implements Runnable, Describable, 
 	}
 	
 	@JsonProperty("state")
-	public float state()
+	public State state()
 	{
 		return m_state;
 	}
 	
 	@JsonProperty("state")
-	public void state(float state)
+	public void state(State state)
 	{
+		StateChange change = new StateChange();
+		change.target = this;
+		change.formerState = state();
+		change.newState = state;
+		
+		System.out.println(	"Task:" + descriptor().commonName() + "> State changed from "
+							+ change.formerState + " to " + change.newState);
+		
 		m_state = state;
+		
+		if(m_stateStream.downstreamSubscription() != null)
+			m_stateStream.onNext(change);
 	}
 	
 	@JsonProperty("descriptor")
@@ -147,6 +193,7 @@ public abstract class Task <T extends Result> implements Runnable, Describable, 
     	checkConfiguration();
     	   		
     	configured();
+    	state(State.CONFIGURED);
     }  
     
     public void requireConfiguration(String requirement)
@@ -229,8 +276,6 @@ public abstract class Task <T extends Result> implements Runnable, Describable, 
 	
 	private void finished()
 	{
-		System.out.println("Task:" + this + "> notifying finished: " + Thread.currentThread());
-		m_hasFinished.onNext(this);
 	}
 	
 	public String toString()
