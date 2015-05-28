@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 
 import org.dutil.lawnch.model.result.Result;
+import org.dutil.lawnch.system.SessionInterface;
 
 import ro.fortsoft.pf4j.ExtensionPoint;
 
@@ -13,7 +14,6 @@ public abstract class PluginService<T extends Result> extends Service<T> impleme
 	
 	public PluginService()
 	{
-		super();
     	m_classLoader = "Plugin";
     	descriptor().pluginIdentifier(true);
 	}

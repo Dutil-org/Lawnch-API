@@ -4,6 +4,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
+
+import org.dutil.lawnch.system.SessionInterface;
 
 import ro.fortsoft.pf4j.ExtensionPoint;
 
@@ -17,6 +20,8 @@ public abstract class Result implements ExtensionPoint {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
 	private long m_id;
+	@Transient
+	protected SessionInterface m_session;
 	
 	public void id(long id)
 	{
@@ -37,4 +42,10 @@ public abstract class Result implements ExtensionPoint {
 	
 	@JsonProperty("storage")
 	public abstract void fromJsonString(String allData);
+	
+	
+	public void session(SessionInterface session)
+	{
+		m_session = session;
+	}
 }

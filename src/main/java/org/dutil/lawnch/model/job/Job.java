@@ -8,6 +8,7 @@ import javax.persistence.OneToOne;
 
 import org.dutil.lawnch.model.result.Result;
 import org.dutil.lawnch.model.task.Task;
+import org.dutil.lawnch.system.SessionInterface;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

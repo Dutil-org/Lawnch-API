@@ -16,8 +16,10 @@ import javax.persistence.Transient;
 import org.dutil.lawnch.model.descriptor.Describable;
 import org.dutil.lawnch.model.descriptor.Descriptor;
 import org.dutil.lawnch.model.result.Result;
+import org.dutil.lawnch.system.SessionInterface;
 
 import reactor.rx.broadcast.Broadcaster;
+import reactor.core.processor.RingBufferProcessor;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -46,10 +48,12 @@ public abstract class Task <T extends Result> implements Runnable, Describable, 
 	private List<TaskRepresentative> m_dependencies;
     
     @Transient
-    Broadcaster<Task> m_hasFinished;
+    private Broadcaster<Task> m_hasFinished;
     @Transient 
-    List<String> m_requirements;
-	
+    private List<String> m_requirements;
+    @Transient 
+	private SessionInterface m_session;
+    
 	public abstract T result();
 	public abstract void execute();
 	
@@ -58,6 +62,28 @@ public abstract class Task <T extends Result> implements Runnable, Describable, 
     	m_descriptor = new Descriptor((Class<Task>)this.getClass());
     	m_descriptor.commonName(this.getClass().getName());
     	m_dependencies = new Vector<TaskRepresentative>();
+    	m_hasFinished = Broadcaster.create();
+	}
+	
+	public void session(SessionInterface session)
+	{
+		m_session = session;
+		if(result() != null)
+			try 
+			{
+				result().session(session());
+			} 
+			catch (NoActiveSessionException e) 
+			{
+				e.printStackTrace();
+			}
+	}
+	
+	public SessionInterface session() throws NoActiveSessionException
+	{
+		if(m_session == null)
+			throw new NoActiveSessionException(this);
+		return m_session;
 	}
 	
 	public void run()
@@ -68,10 +94,9 @@ public abstract class Task <T extends Result> implements Runnable, Describable, 
 		finished();
 	}
 	
-	public void setBroadcasters(Broadcaster<Task> hasFinished)
+	public Broadcaster<Task> finishedBroadcaster()
 	{
-		System.out.println("Task:" + this + "> Setting Broadcaster");
-		m_hasFinished = hasFinished;
+		return m_hasFinished;
 	}
 	
 	@JsonProperty("id")
@@ -199,21 +224,13 @@ public abstract class Task <T extends Result> implements Runnable, Describable, 
 	}
 	
 	protected void setDependencies()
-	{
-		
+	{	
 	}
 	
 	private void finished()
 	{
-		System.out.println("TaskExecutor:" + this + "> notifying finished");
+		System.out.println("Task:" + this + "> notifying finished: " + Thread.currentThread());
 		m_hasFinished.onNext(this);
-	}
-	
-	public String eventTracker() throws NotYetPersistedException
-	{
-		if(id() == 0)
-			throw new NotYetPersistedException(this);
-		return descriptor().identifier() + ":" + id();
 	}
 	
 	public String toString()

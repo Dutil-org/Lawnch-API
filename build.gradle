@@ -27,6 +27,6 @@ dependencies {
   compile 'ro.fortsoft.pf4j:pf4j:0.4'
   compile 'org.springframework.boot:spring-boot-starter-web'
   compile 'org.springframework.boot:spring-boot-starter-data-jpa'
-  compile 'io.projectreactor.spring:reactor-spring-context:2.0.0.RC1'
+  compile 'io.projectreactor.spring:reactor-spring-context:2.0.2.RELEASE'
   testCompile group: 'junit', name: 'junit', version: '4.+'
 }

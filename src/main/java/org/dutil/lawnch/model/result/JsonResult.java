@@ -7,8 +7,6 @@ import javax.persistence.Inheritance;
 import javax.persistence.Transient;
 
 import org.bson.Document;
-import org.dutil.lawnch.system.GlobalState;
-import org.dutil.lawnch.system.ObjectNotRegisteredException;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.mongodb.client.FindIterable;
@@ -78,11 +76,15 @@ public class JsonResult extends Result {
 		String allData = "";
 		
 		MongoCursor<Document> cursor = find("{}").iterator();
-		try {
-		    while (cursor.hasNext()) {
+		try 
+		{
+		    while(cursor.hasNext()) 
+		    {
 		        allData += cursor.next().toJson();
 		    }
-		} finally {
+		} 
+		finally 
+		{
 		    cursor.close();
 		}
 
@@ -93,15 +95,8 @@ public class JsonResult extends Result {
 	{
 		if(m_collection == null)
 		{
-			try 
-			{
-				MongoDatabase mongoDB = GlobalState.get("MongoDB");
-				m_collection = mongoDB.getCollection("JsonResult");
-			} 
-			catch (ObjectNotRegisteredException e) 
-			{
-				e.printStackTrace();
-			}
+			MongoDatabase mongoDB = m_session.sessionPersistence().getMongoDb();
+			m_collection = mongoDB.getCollection("JsonResult");
 		}
 	}
 

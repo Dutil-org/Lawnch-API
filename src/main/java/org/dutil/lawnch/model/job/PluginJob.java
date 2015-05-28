@@ -13,7 +13,6 @@ public abstract class PluginJob <T extends Result> extends Job<T> implements Ext
 	
 	public PluginJob()
 	{
-		super();
     	m_classLoader = "Plugin";
     	descriptor().pluginIdentifier(true);
 	}
