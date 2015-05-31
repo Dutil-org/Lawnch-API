@@ -71,8 +71,13 @@ public abstract class Task <T extends Result> implements Runnable, Describable, 
     @Transient 
 	private SessionInterface m_session;
     
+    @JsonProperty("result")
 	public abstract T result();
-	public abstract void execute();
+    
+    @JsonProperty("result")
+    protected abstract void result(T result);
+    
+	public abstract T execute();
 	
 	public Task()
 	{
@@ -124,6 +129,8 @@ public abstract class Task <T extends Result> implements Runnable, Describable, 
 	public void run()
 	{
 		state(State.RUNNING);
+//		if(result() != null)
+//			result(execute());
 		execute();
 		state(State.FINISHED);
 		finished();

@@ -44,13 +44,13 @@ public abstract class Service<T extends Result> extends Task<T>
     	m_jobs = new ArrayList<Task>();
     }    
     
-    @JsonProperty("result")
+    @Override
     protected void result(T result)
     {
     	m_result = result;
     }
     
-    @JsonProperty("result")
+    @Override
     public T result()
     {
     	return m_result;
@@ -67,9 +67,10 @@ public abstract class Service<T extends Result> extends Task<T>
 		return jobs();
 	}
 	
-	public final void execute()
+	public final T execute()
 	{
 		System.out.println("Service:" + this + "> executing empty core execution method");
+		return null;
 	}
 	
 	// TODO: its necessary for the serviceexecutor that the subtaskqueue gets removed after extractions
