@@ -39,48 +39,8 @@ public class RegisteringPlugin extends Plugin {
 		ClassLoader localPluginLoader = this.getClass().getClassLoader();
 			
 		//register Plugin Repositories
-		m_pluginManager.registerClassLoader(localPluginLoader);
+		m_pluginManager.registerClassLoader(localPluginLoader, this.getClass().getPackage().getName());
 
-    	// create scanner and disable default filters (that is the 'false' argument)
-    	final ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
-    	provider.setResourceLoader(new PathMatchingResourcePatternResolver(localPluginLoader));
-    	
-    	// add include filters which matches all the classes (or use your own)
-    	provider.addIncludeFilter((TypeFilter) new AssignableTypeFilter(GenericServiceProvider.class));
-    	// get matching classes defined in the package
-    	final Set<BeanDefinition> classes = provider.findCandidateComponents(this.getClass().getPackage().getName());
-    	
-    	for (BeanDefinition definition : classes) {
-			try 
-			{
-				Class<GenericServiceProvider> registeredClass;
-				registeredClass = (Class<GenericServiceProvider>) localPluginLoader.loadClass(definition.getBeanClassName());
-
-				GenericServiceProvider instance = registeredClass.newInstance();
-				instance.registry(m_pluginManager.createRegistry(	
-						localPluginLoader, 
-						(Class<Service>) Class.forName("org.dutil.lawnch.model.service.Service"), 
-						instance.getClass().getPackage().getName()));
-				m_pluginManager.registerServiceProvider(instance);
-			} 
-			catch (ClassNotFoundException e) 
-			{
-				e.printStackTrace();
-			} 
-			catch (IllegalAccessException e) 
-			{
-				e.printStackTrace();
-			} 
-			catch (IllegalArgumentException e) 
-			{
-				e.printStackTrace();
-			} 
-			catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		
-    	}
 	}
 
 }
