@@ -21,6 +21,8 @@ public class JsonResult extends Result {
 		
 	@Transient
 	MongoCollection m_collection;
+//	@Transient
+//	private String m_cache;
 	
 	public JsonResult()
 	{
@@ -32,6 +34,7 @@ public class JsonResult extends Result {
 		Document insertDocument = new Document("id", id());
 		insertDocument.append("storage", Document.parse(jsonObject));
 		m_collection.insertOne(insertDocument);
+//		m_cache = jsonObject;
 	}
 	
 	public Document findOne(String query, String selection)
@@ -73,6 +76,9 @@ public class JsonResult extends Result {
 
 	@Override
 	public String allJson() {
+//		if(m_cache != null)
+//			return m_cache;
+		
 		String allData = "";
 		
 		MongoCursor<Document> cursor = find("{}").iterator();

@@ -3,7 +3,7 @@ package org.dutil.lawnch.plugin;
 import java.util.Set;
 
 import org.dutil.lawnch.model.service.Service;
-import org.dutil.lawnch.model.serviceprovider.GenericServiceProvider;
+import org.dutil.lawnch.model.serviceprovider.ServiceProvider;
 import org.dutil.lawnch.system.GlobalState;
 import org.dutil.lawnch.system.ObjectNotRegisteredException;
 import org.springframework.beans.factory.config.BeanDefinition;
