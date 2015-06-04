@@ -10,19 +10,21 @@ import org.dutil.lawnch.model.task.ConfigurationFailedException;
 import org.dutil.lawnch.model.task.StatelessTask;
 import org.dutil.lawnch.plugin.RegistryInterface;
 
+import ro.fortsoft.pf4j.ExtensionPoint;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
-public class StatelessServiceProvider implements Provider<StatelessService>{
+public class StatelessServiceProvider implements ExtensionPoint, Provider<StatelessService>{
 	
-	HashMap<String, StatelessService> m_instances;
+	private HashMap<String, StatelessService> m_instances;
 	@JsonProperty("descriptor")
     private Descriptor m_descriptor;
     @JsonIgnore
 	protected RegistryInterface<StatelessService> m_serviceRegistry;
     
-    StatelessServiceProvider()
+    public StatelessServiceProvider()
     {
     	m_descriptor = new Descriptor<StatelessServiceProvider>((Class<StatelessServiceProvider>)this.getClass());
     	m_descriptor.commonName(this.getClass().getName());
