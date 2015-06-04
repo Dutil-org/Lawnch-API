@@ -19,8 +19,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class StatelessServiceProvider implements ExtensionPoint, Provider<StatelessService>{
 	
 	private HashMap<String, StatelessService> m_instances;
+	
 	@JsonProperty("descriptor")
     private Descriptor m_descriptor;
+	
     @JsonIgnore
 	protected RegistryInterface<StatelessService> m_serviceRegistry;
     
@@ -28,6 +30,7 @@ public class StatelessServiceProvider implements ExtensionPoint, Provider<Statel
     {
     	m_descriptor = new Descriptor<StatelessServiceProvider>((Class<StatelessServiceProvider>)this.getClass());
     	m_descriptor.commonName(this.getClass().getName());
+    	m_instances = new HashMap<String, StatelessService>();
     }
 	
     @Override
@@ -45,7 +48,7 @@ public class StatelessServiceProvider implements ExtensionPoint, Provider<Statel
 		task.descriptor().providerIdentifier(m_descriptor.identifier());
     	m_instances.put(serviceIdentifier, task);
     	
-    	return null;
+    	return task;
     }
 
     @Override
