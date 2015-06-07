@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public interface Provider<T extends Describable> extends Describable{
 	// returns a hasmap cansisting of a preconfigured Service and the services description
 	HashMap<String, Descriptor<T>> services();
+	
 	Descriptor descriptor(String serviceIdentifier);
 	   
     public void registry(RegistryInterface<T> registry);

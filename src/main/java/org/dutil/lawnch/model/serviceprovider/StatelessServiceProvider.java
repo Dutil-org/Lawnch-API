@@ -39,9 +39,23 @@ public class StatelessServiceProvider implements ExtensionPoint, Provider<Statel
     	StatelessService task = m_instances.get(serviceIdentifier);
     	if(task != null)
     		return task;
-    	
+     	
+    	return lazyInitializeService(serviceIdentifier);
+    }
+    
+    private StatelessService lazyInitializeService(String serviceIdentifier)
+    {
     	Class<StatelessService> serviceClass = m_serviceRegistry.get(serviceIdentifier).classDescriptor();
-    	task = (StatelessService) serviceClass.newInstance();
+    	StatelessService task = null;
+    	
+		try 
+		{
+			task = (StatelessService) serviceClass.newInstance();
+		} 
+		catch (InstantiationException | IllegalAccessException e)
+		{
+			e.printStackTrace();
+		}
     	
     	System.out.println("StatelessServiceProvider> creating Service: " + task.descriptor().commonName());
     	
@@ -81,5 +95,13 @@ public class StatelessServiceProvider implements ExtensionPoint, Provider<Statel
 	public Descriptor descriptor(String serviceIdentifier)
 	{
 		return m_serviceRegistry.descriptor(serviceIdentifier);
+	}
+	
+	public HashMap<String, StatelessService> instances()
+	{
+		for(String service : m_serviceRegistry.allDescriptors().keySet())
+			if(!m_instances.containsKey(service))
+				lazyInitializeService(service);
+		return m_instances;
 	}
 }

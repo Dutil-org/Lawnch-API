@@ -5,20 +5,26 @@ import java.util.List;
 
 import javax.persistence.Transient;
 
+import org.dutil.lawnch.execution.Streamable;
 import org.dutil.lawnch.model.descriptor.Describable;
 import org.dutil.lawnch.model.descriptor.Descriptor;
 import org.dutil.lawnch.model.result.Result;
 import org.dutil.lawnch.system.SessionInterface;
 
+import reactor.rx.Stream;
+import reactor.rx.broadcast.Broadcaster;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public abstract class StatelessTask<T extends Result> implements Describable{
+public abstract class StatelessTask<T extends Result> implements Describable, Streamable {
 
 	private List<StatelessTaskRepresentative> m_dependencies;
 	
     @JsonProperty("descriptor")
     @Transient
     protected Descriptor m_descriptor;
+    
+    Broadcaster<TaskEnvironment> m_broadcaster;
 	
 	public StatelessTask()
 	{
@@ -53,6 +59,17 @@ public abstract class StatelessTask<T extends Result> implements Describable{
 		dependency.configuration = configuration;
 		m_dependencies.add(dependency);
 	}
+
+	public TaskEnvironment handleStream(TaskEnvironment env)
+	{
+		env.container = execute(env.container, env.session);
+		return env;
+	}
 	
 	public abstract T execute(Result configuration, SessionInterface session);
+	
+	public void setupStreams(Stream<TaskEnvironment> stream)
+	{
+		
+	}
 }

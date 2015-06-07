@@ -1,10 +1,15 @@
 package org.dutil.lawnch.plugin;
 
 import org.dutil.lawnch.model.descriptor.Describable;
-import org.dutil.lawnch.model.serviceprovider.ServiceProvider;
+import org.dutil.lawnch.model.descriptor.Descriptor;
 import org.dutil.lawnch.model.serviceprovider.ServiceProviderRepositoryInterface;
 import org.dutil.lawnch.model.serviceprovider.StatelessServiceProviderRepositoryInterface;
+import org.dutil.lawnch.model.task.AllreadyRegisteredException;
+import org.dutil.lawnch.model.task.TaskEnvironment;
+import org.dutil.lawnch.model.task.TaskNotFoundException;
 import org.dutil.lawnch.system.PersistenceUnit;
+
+import reactor.rx.Stream;
 
 public interface PluginManagerInterface {
 	PersistenceUnit createPersistenceUnit();
@@ -12,4 +17,7 @@ public interface PluginManagerInterface {
 	<T extends Describable> RegistryInterface<T> createRegistry(ClassLoader classLoader, Class<T> type, String packageName);
 	ServiceProviderRepositoryInterface serviceProviderRepository();
 	StatelessServiceProviderRepositoryInterface statelessServiceProviderRepository();
+	Stream<TaskEnvironment> stream(Descriptor task) throws TaskNotFoundException;
+	void registerStream(Descriptor task, Stream<TaskEnvironment> stream) throws AllreadyRegisteredException;
+	void signalStream(TaskEnvironment env);
 }
