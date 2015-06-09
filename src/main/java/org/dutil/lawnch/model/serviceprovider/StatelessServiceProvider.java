@@ -8,6 +8,7 @@ import org.dutil.lawnch.model.service.Service;
 import org.dutil.lawnch.model.service.StatelessService;
 import org.dutil.lawnch.model.task.ConfigurationFailedException;
 import org.dutil.lawnch.model.task.StatelessTask;
+import org.dutil.lawnch.model.task.TaskNotFoundException;
 import org.dutil.lawnch.plugin.RegistryInterface;
 
 import ro.fortsoft.pf4j.ExtensionPoint;
@@ -34,7 +35,7 @@ public class StatelessServiceProvider implements ExtensionPoint, Provider<Statel
     }
 	
     @Override
-    public StatelessService service(String serviceIdentifier, Result configuration) throws InstantiationException, IllegalAccessException
+    public StatelessService service(String serviceIdentifier, Result configuration) throws InstantiationException, IllegalAccessException, TaskNotFoundException
     {
     	StatelessService task = m_instances.get(serviceIdentifier);
     	if(task != null)
@@ -43,7 +44,7 @@ public class StatelessServiceProvider implements ExtensionPoint, Provider<Statel
     	return lazyInitializeService(serviceIdentifier);
     }
     
-    private StatelessService lazyInitializeService(String serviceIdentifier)
+    private StatelessService lazyInitializeService(String serviceIdentifier) throws TaskNotFoundException
     {
     	Class<StatelessService> serviceClass = m_serviceRegistry.get(serviceIdentifier).classDescriptor();
     	StatelessService task = null;
@@ -97,11 +98,11 @@ public class StatelessServiceProvider implements ExtensionPoint, Provider<Statel
 		return m_serviceRegistry.descriptor(serviceIdentifier);
 	}
 	
-	public HashMap<String, StatelessService> instances()
-	{
-		for(String service : m_serviceRegistry.allDescriptors().keySet())
-			if(!m_instances.containsKey(service))
-				lazyInitializeService(service);
-		return m_instances;
-	}
+//	public HashMap<String, StatelessService> instances()
+//	{
+//		for(String service : m_serviceRegistry.allDescriptors().keySet())
+//			if(!m_instances.containsKey(service))
+//				lazyInitializeService(service);
+//		return m_instances;
+//	}
 }

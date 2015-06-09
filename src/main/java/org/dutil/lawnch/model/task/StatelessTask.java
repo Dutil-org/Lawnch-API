@@ -67,9 +67,4 @@ public abstract class StatelessTask<T extends Result> implements Describable, St
 	}
 	
 	public abstract T execute(Result configuration, SessionInterface session);
-	
-	public void setupStreams(Stream<TaskEnvironment> stream)
-	{
-		
-	}
 }

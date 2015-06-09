@@ -6,6 +6,7 @@ import org.dutil.lawnch.model.descriptor.Descriptor;
 import org.dutil.lawnch.model.result.Result;
 import org.dutil.lawnch.model.service.Service;
 import org.dutil.lawnch.model.task.ConfigurationFailedException;
+import org.dutil.lawnch.model.task.TaskNotFoundException;
 import org.dutil.lawnch.plugin.RegistryInterface;
 
 import ro.fortsoft.pf4j.ExtensionPoint;
@@ -47,7 +48,7 @@ public class ServiceProvider implements ExtensionPoint, Provider<Service>
     }
     
     @Override
-    public Service service(String serviceIdentifier, Result configuration) throws InstantiationException, IllegalAccessException
+    public Service service(String serviceIdentifier, Result configuration) throws InstantiationException, IllegalAccessException, TaskNotFoundException
     {
     	Class<Service> serviceClass = m_serviceRegistry.get(serviceIdentifier).classDescriptor();
     	Service newService = (Service) serviceClass.newInstance();

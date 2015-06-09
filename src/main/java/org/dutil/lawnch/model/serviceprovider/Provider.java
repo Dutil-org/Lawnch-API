@@ -6,6 +6,7 @@ import org.dutil.lawnch.model.descriptor.Describable;
 import org.dutil.lawnch.model.descriptor.Descriptor;
 import org.dutil.lawnch.model.result.Result;
 import org.dutil.lawnch.model.service.Service;
+import org.dutil.lawnch.model.task.TaskNotFoundException;
 import org.dutil.lawnch.plugin.RegistryInterface;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -24,5 +25,5 @@ public interface Provider<T extends Describable> extends Describable{
     public boolean has(String identifier);
 	
 	// returns the service identified by its Classname
-	public  T service(String serviceName, Result configuration) throws InstantiationException, IllegalAccessException;
+	public  T service(String serviceName, Result configuration) throws InstantiationException, IllegalAccessException, TaskNotFoundException;
 }
